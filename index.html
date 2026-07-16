@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IronCore Gym</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <img src="assets/ironcore-logo.png" alt="IronCore Gym Logo" class="navbar-logo">
+    <nav class="menu">
+      <a href="adminlogin.html">Admin</a>
+      <a href="index.html">Overview</a>
+      <a href="login.html">Login</a>
+      <a href="membership.html">Join Now</a>
+    </nav>
+
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <video autoplay muted loop id="bg-video">
+      <source src="assets/gym_video.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
+    <div class="overlay">
+      <div class="description-box">
+        <img src="assets/ironcore-logo.png" alt="IronCore Gym Logo" class="hero-logo" />
+        <h2 class="tagline">BUILD STRENGTH,<br>TRANSFORM YOUR LIFE</h2>
+        <p class="hero-text">
+          Join IronCore Gym to achieve your fitness goals<br>
+          with <strong>state-of-the-art</strong> equipment and expert<br>
+          trainers dedicated to your success.
+        </p>
+        <a href="membership.html" class="cta-btn">JOIN NOW</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-column">
+        <h3>About IronCore</h3>
+        <p>
+          IronCore Gym is your second home. With top-tier equipment and expert trainers, we’re here to help you break limits and achieve results.
+        </p>
+      </div>
+
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+        <a href="adminlogin.html">Admin</a><br>
+        <a href="index.html">Overview</a><br>
+        <a href="login.html">Login</a><br>
+        <a href="membership.html">Join Now</a>
+      </div>
+
+      <div class="footer-column">
+        <h3>Contact</h3>
+        <p>Email: contact@ironcoregym.com</p>
+        <p>Phone: +1 234 567 8901</p>
+        <p>Location: 123 Flex Ave, Muscle City</p>
+      </div>
+
+      <div class="footer-column">
+        <h3>Social Links</h3>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-newsletter-box">
+      <h3>Subscribe to Our Newsletter</h3>
+      <p>Get updates on new classes, special offers, and fitness tips.</p>
+      <form class="newsletter-form">
+        <input type="email" placeholder="Enter your email" required>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+
+    <div class="map-container">
+      <iframe src="https://maps.google.com/maps?q=New%20York%20Gym&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <div class="footer-bottom">
+      © 2025 IronCore Gym. All rights reserved.
+    </div>
+  </footer>
+
+
+</body>
+</html>

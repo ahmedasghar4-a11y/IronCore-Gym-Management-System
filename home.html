@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IronCore Gym - Home</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Navbar -->
+<header class="navbar">
+  <img src="assets/ironcore-logo.png" alt="IronCore Gym Logo" class="navbar-logo">
+  <nav class="menu">
+    <a href="index.html">Overview</a>
+    <a href="home.html">Home</a>
+    <a href="schedule.html">Classes</a>
+    <a href="trainers.html">Trainers</a>
+    <a href="my_bookings.html">Bookings</a>
+
+    <a href="profile.html" title="Update Profile" class="profile-link">
+      <i class="fas fa-user-circle"></i>
+    </a>
+  </nav>
+</header>
+
+
+
+  <!-- Slideshow -->
+  <div class="slideshow-container">
+    <div class="mySlides fade">
+      <img src="assets/equipment1.jpeg" alt="Slide 1">
+      <div class="text">Top-Quality Equipment</div>
+    </div>
+    <div class="mySlides fade">
+      <img src="assets/equipment2.jpg" alt="Slide 2">
+      <div class="text">Spacious Workout Area</div>
+    </div>
+    <div class="mySlides fade">
+      <img src="assets/equipment3.jpg" alt="Slide 3">
+      <div class="text">Train with Experts</div>
+    </div>
+  </div>
+
+  <div class="dots-container">
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+<!-- Feature Grid -->
+<section class="card-grid">
+  <div class="feature-card">
+    <h3>Level Up your Training</h3>
+      <button onclick="window.location.href='schedule.html'">Go</button>
+  </div>
+  <div class="feature-card">
+    <h3> Scheduled Sessions</h3>
+      <button onclick="window.location.href='my_bookings.html'">Go</button>
+  </div>
+  <div class="feature-card">
+    <h3>Trainers </h3>
+    <button onclick="window.location.href='trainers.html'">Go</button>
+  </div>
+</section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-column">
+        <h3>About IronCore</h3>
+        <p>
+          IronCore Gym is your second home. With top-tier equipment and expert trainers, we’re here to help you break limits and achieve results.
+        </p>
+      </div>
+
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+    <a href="home.html">Home</a><br>
+    <a href="schedule.html">Classes</a><br>
+    <a href="trainers.html">Trainers</a><br>
+    <a href="my_bookings.html">Bookings</a>
+      </div>
+
+      <div class="footer-column">
+        <h3>Contact</h3>
+        <p>Email: contact@ironcoregym.com</p>
+        <p>Phone: +1 234 567 8901</p>
+        <p>Location: 123 Flex Ave, Muscle City</p>
+      </div>
+
+      <div class="footer-column">
+        <h3>Social Links</h3>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-newsletter-box">
+      <h3>Subscribe to Our Newsletter</h3>
+      <p>Get updates on new classes, special offers, and fitness tips.</p>
+      <form class="newsletter-form">
+        <input type="email" placeholder="Enter your email" required>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+
+    <div class="map-container">
+      <iframe src="https://maps.google.com/maps?q=New%20York%20Gym&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <div class="footer-bottom">
+      © 2025 IronCore Gym. All rights reserved.
+    </div>
+  </footer>
+
+<!-- Chat Button and Popup -->
+<button id="open-chat-btn" aria-label="Open Chat">💬</button>
+<div id="chat-popup">
+  <div id="chat-popup-header">Chat with Admin</div>
+  <button id="close-chat-btn" aria-label="Close Chat">✖️</button>
+  <div id="chat-messages"></div>
+  <div id="chat-input-wrapper">
+    <input type="text" id="chat-input" placeholder="Type your message...">
+    <button id="chat-send">Send</button>
+  </div>
+</div>
+
+<!-- Script -->
+<script>
+const isAdmin = window.location.pathname.includes('admin');
+const chatDataKey = 'ironcore_chat_messages';
+
+function getMessages() {
+  return JSON.parse(localStorage.getItem(chatDataKey) || '[]');
+}
+
+function saveMessage(sender, text) {
+  const messages = getMessages();
+  messages.push({ sender, text, time: new Date().toISOString() });
+  localStorage.setItem(chatDataKey, JSON.stringify(messages));
+}
+
+function renderMessages(container) {
+  container.innerHTML = '';
+  const messages = getMessages();
+  messages.forEach(({ sender, text }) => {
+    const div = document.createElement('div');
+    div.className = 'message ' + sender;
+    div.textContent = text;
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage(sender, inputId, container) {
+  const input = document.getElementById(inputId);
+  const text = input.value.trim();
+  if (!text) return;
+  saveMessage(sender, text);
+  input.value = '';
+  renderMessages(container);
+}
+
+function setupChat() {
+  const openBtn = document.getElementById('open-chat-btn');
+  const popup = document.getElementById('chat-popup');
+  const sendBtn = document.getElementById('chat-send');
+  const input = document.getElementById('chat-input');
+  const messagesBox = document.getElementById('chat-messages');
+  const closeBtn = document.getElementById('close-chat-btn');
+
+  // Toggle open/close
+  if (openBtn && popup) {
+    openBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
+      renderMessages(messagesBox);
+    });
+  }
+
+  // Send on click or Enter
+  if (sendBtn && input) {
+    sendBtn.addEventListener('click', () => {
+      sendMessage(isAdmin ? 'admin' : 'guest', 'chat-input', messagesBox);
+    });
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage(isAdmin ? 'admin' : 'guest', 'chat-input', messagesBox);
+      }
+    });
+  }
+
+  // Close button in chat
+  if (closeBtn && popup) {
+    closeBtn.addEventListener('click', () => {
+      popup.style.display = 'none';
+    });
+  }
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (popup && !popup.contains(e.target) && e.target !== openBtn) {
+      popup.style.display = 'none';
+    }
+  });
+
+  renderMessages(messagesBox);
+}
+
+document.addEventListener('DOMContentLoaded', setupChat);
+</script>
+
+
+  <!-- Slideshow Script -->
+  <script>
+    let slideIndex = 0;
+    const showSlides = () => {
+      const slides = document.getElementsByClassName("mySlides");
+      const dots = document.getElementsByClassName("dot");
+      for (let i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+      }
+      slideIndex++;
+      if (slideIndex > slides.length) { slideIndex = 1; }
+      for (let i = 0; i < dots.length; i++) {
+        dots[i].className = dots[i].className.replace(" active", "");
+      }
+      slides[slideIndex - 1].style.display = "block";
+      dots[slideIndex - 1].className += " active";
+      setTimeout(showSlides, 4000); // Change image every 4 seconds
+    };
+    showSlides();
+  </script>
+</body>
+</html>

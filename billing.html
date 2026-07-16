@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Billing - IronCore Gym</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <img src="assets/ironcore-logo.png" alt="IronCore Gym Logo" class="navbar-logo">
+    <nav class="menu">
+      <a href="index.html">Overview</a>
+      <a href="login.html">Login</a>
+      <a href="membership.html">Membership</a>
+    </nav>
+  </header>
+
+  <!-- Billing Section -->
+  <section class="billing-section">
+    <div class="billing-container">
+      <h2>Review Your Plan & Confirm</h2>
+      <div id="billing-summary" class="billing-box">
+        <!-- Dynamic plan content inserted here -->
+      </div>
+      <button class="cta-btn" onclick="finishBilling()">Confirm & Complete Membership</button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-column">
+        <h3>About IronCore</h3>
+        <p>IronCore Gym is your second home. With top-tier equipment and expert trainers, we’re here to help you break limits and achieve results.</p>
+      </div>
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+        <a href="index.html">Overview</a><br>
+        <a href="login.html">Login</a><br>
+        <a href="membership.html">Membership</a>
+      </div>
+      <div class="footer-column">
+        <h3>Contact</h3>
+        <p>Email: contact@ironcoregym.com</p>
+        <p>Phone: +1 234 567 8901</p>
+        <p>Location: 123 Flex Ave, Muscle City</p>
+      </div>
+      <div class="footer-column">
+        <h3>Social Links</h3>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-newsletter-box">
+      <h3>Subscribe to Our Newsletter</h3>
+      <p>Get updates on new classes, special offers, and fitness tips.</p>
+      <form class="newsletter-form">
+        <input type="email" placeholder="Enter your email" required>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+
+    <div class="map-container">
+      <iframe src="https://maps.google.com/maps?q=New%20York%20Gym&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <div class="footer-bottom">
+      © 2025 IronCore Gym. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const plan = urlParams.get("plan") || "basic";
+      const billingBox = document.getElementById("billing-summary");
+
+      const summaries = {
+        basic: `
+          <h3>Basic Plan</h3>
+          <p><strong>Price:</strong> £19/month</p>
+          <p><strong>Includes:</strong> 24/7 gym access, cardio & weights</p>
+          <p><strong>Joining Fee:</strong> £10</p>
+          <p><strong>Billing:</strong> Monthly, cancel anytime</p>
+        `,
+        standard: `
+          <h3>Standard Plan</h3>
+          <p><strong>Price:</strong> £39/month</p>
+          <p><strong>Includes:</strong> All Basic features + fitness classes & tracking</p>
+          <p><strong>Joining Fee:</strong> Waived</p>
+          <p><strong>Billing:</strong> Monthly, flexible terms</p>
+        `,
+        premium: `
+          <h3>Premium Plan</h3>
+          <p><strong>Price:</strong> £69/month or £745/year</p>
+          <p><strong>Includes:</strong> Everything in Standard + personal training & diet</p>
+          <p><strong>Joining Fee:</strong> Waived</p>
+          <p><strong>Billing:</strong> 3-month minimum, yearly savings</p>
+        `
+      };
+
+      billingBox.innerHTML = summaries[plan] || summaries.basic;
+    });
+document.addEventListener("DOMContentLoaded", function () {
+  const plan = localStorage.getItem("selectedPlan") || "basic";
+  const formatted = plan.charAt(0).toUpperCase() + plan.slice(1);
+
+  const prices = {
+    basic: "£19",
+    standard: "£39",
+    premium: "£69"
+  };
+
+  const billingPlan = document.getElementById("billingPlan");
+  const billingAmount = document.getElementById("billingAmount");
+
+  if (billingPlan) billingPlan.value = `${formatted} Plan`;
+  if (billingAmount) billingAmount.value = prices[plan] || "£19";
+});
+
+function finishBilling() {
+  document.getElementById("paymentModal").classList.add("active");
+  const navbar = document.querySelector("header.navbar");
+  if (navbar) navbar.style.display = "none";
+}
+
+function processPayment(event) {
+  event.preventDefault();
+  alert("✅ Payment successful! Welcome to IronCore Gym.");
+  window.location.href = "home.html";
+}
+
+function closePaymentModal() {
+  document.getElementById("paymentModal").classList.remove("active");
+  const navbar = document.querySelector("header.navbar");
+  if (navbar) navbar.style.display = "flex";
+}
+
+
+
+
+
+  </script>
+<!-- Payment Modal -->
+<!-- Payment Modal -->
+<div id="paymentModal" class="modal">
+  <div class="payment-screen">
+    <div class="modal-content">
+      <span class="close-payment" onclick="closePaymentModal()">&times;</span>
+      <h3>Secure Checkout</h3>
+      <form class="payment-form" id="paymentForm" onsubmit="processPayment(event)">
+  <!-- Plan Info -->
+  <div class="input-group">
+    <label><i class="fas fa-dumbbell"></i> Selected Plan</label>
+    <input type="text" id="billingPlan" readonly />
+  </div>
+  <div class="input-group">
+    <label><i class="fas fa-pound-sign"></i> Amount</label>
+    <input type="text" id="billingAmount" readonly />
+  </div>
+
+  <!-- Card Details -->
+  <div class="input-group">
+    <label><i class="fas fa-user"></i> Cardholder Name</label>
+    <input type="text" placeholder="John Doe" required />
+  </div>
+  <div class="input-group">
+    <label><i class="fas fa-credit-card"></i> Card Number</label>
+    <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" required />
+  </div>
+  <div class="input-row">
+    <div class="input-group">
+      <label><i class="far fa-calendar-alt"></i> Expiry</label>
+      <input type="text" placeholder="MM/YY" maxlength="5" required />
+    </div>
+    <div class="input-group">
+      <label><i class="fas fa-lock"></i> CVV</label>
+      <input type="text" placeholder="123" maxlength="4" required />
+    </div>
+  </div>
+  <div class="input-group">
+    <label><i class="fas fa-map-marker-alt"></i> Billing ZIP/Postal Code</label>
+    <input type="text" placeholder="12345" required />
+  </div>
+  <button type="submit" class="cta-btn">Pay & Complete</button>
+</form>
+
+    </div>
+  </div>
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login - IronCore Gym</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" /> <!-- Your separate admin-specific styles -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="admin-login-body">
+
+  <div class="admin-login-box">
+    <h2>Admin Login</h2>
+    <form onsubmit="adminLogin(event)">
+      <input type="email" id="adminEmail" placeholder="Admin Email" required />
+      <input type="password" id="adminPassword" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCMAlj_xlSoyIXtsuzNYxOxH1cQ9Fpr97I",
+      authDomain: "ironcoregym-228af.firebaseapp.com",
+      projectId: "ironcoregym-228af"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function adminLogin(event) {
+      event.preventDefault();
+      const email = document.getElementById("adminEmail").value;
+      const password = document.getElementById("adminPassword").value;
+
+      try {
+        const cred = await firebase.auth().signInWithEmailAndPassword(email, password);
+        const doc = await db.collection("adminUsers").doc(email).get();
+
+        if (!doc.exists || !doc.data().isAdmin) {
+          alert("Access denied. Not an admin account.");
+          firebase.auth().signOut();
+          return;
+        }
+
+        alert("✅ Admin login successful");
+        window.location.href = "adminhome.html";
+
+      } catch (err) {
+        alert("Login failed: " + err.message);
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assign Trainers - IronCore Gym</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .navbar {
+      background-color: rgba(20, 20, 20, 0.9);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+    }
+    .navbar-logo {
+      height: 50px;
+    }
+    .menu a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    .container {
+      padding: 100px 20px;
+      text-align: center;
+    }
+    .form-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    input, button {
+      padding: 10px;
+      width: 300px;
+      border-radius: 5px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      background-color: #3CB043;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2f9035;
+    }
+    #confirmationMessage {
+      color: lightgreen;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <img src="assets/ironcore-logo.png" alt="IronCore Gym Logo" class="navbar-logo">
+    <nav class="menu">
+      <a href="index.html">Overview</a>
+      <a href="adminhome.html">Admin</a>
+      <a href="add_trainers.html">Trainers</a>
+      <a href="track_hours.html">Track Hours</a>
+
+    </nav>
+  </header>
+
+  <main class="container">
+    <h2>Assign Trainers</h2>
+    <form id="assignForm" class="form-box">
+      <label for="trainer">Trainer Name:</label>
+      <input type="text" id="trainer" required>
+
+      <label for="class">Class/Session:</label>
+      <input type="text" id="class" required>
+
+      <label for="date">Date:</label>
+      <input type="date" id="date" required>
+
+      <label for="startTime">Start Time:</label>
+      <input type="time" id="startTime" required>
+
+      <label for="endTime">End Time:</label>
+      <input type="time" id="endTime" required>
+
+      <button type="submit">Assign Trainer</button>
+    </form>
+
+    <div id="confirmationMessage" style="display:none;">
+      ✅ Trainer Assigned Successfully!
+    </div>
+  </main>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+     apiKey: "AIzaSyCMAlj_xlSoyIXtsuzNYxOxH1cQ9Fpr97I",
+      authDomain: "ironcoregym-228af.firebaseapp.com",
+      projectId: "ironcoregym-228af",
+      storageBucket: "ironcoregym-228af.appspot.com",
+      messagingSenderId: "1050936195293",
+      appId: "1:1050936195293:web:8bef21a268db39ce7a0334"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function formatTime(timeStr) {
+      const [hour, minute] = timeStr.split(":");
+      const h = parseInt(hour);
+      const ampm = h >= 12 ? "PM" : "AM";
+      const formattedHour = h % 12 === 0 ? 12 : h % 12;
+      return `${formattedHour}:${minute} ${ampm}`;
+    }
+
+    document.getElementById("assignForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const trainer = document.getElementById("trainer").value.trim();
+      const className = document.getElementById("class").value.trim();
+      const date = document.getElementById("date").value;
+      const start = document.getElementById("startTime").value;
+      const end = document.getElementById("endTime").value;
+
+      if (!trainer || !className || !date || !start || !end) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const timeSlot = `${formatTime(start)} - ${formatTime(end)}`;
+
+      db.collection("trainerAssignments").add({
+        trainer: trainer,
+        class: className,
+        date: date,
+        time: timeSlot,
+        timestamp: new Date()
+      })
+      .then(() => {
+        document.getElementById("confirmationMessage").style.display = "block";
+        document.getElementById("assignForm").reset();
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("❌ Could not save. Check console for details.");
+      });
+    });
+  </script>
+<!-- Chat Button and Popup -->
+<button id="open-chat-btn" aria-label="Open Chat">💬</button>
+<div id="chat-popup">
+  <div id="chat-popup-header">Chat with Admin</div>
+  <button id="close-chat-btn" aria-label="Close Chat">✖️</button>
+  <div id="chat-messages"></div>
+  <div id="chat-input-wrapper">
+    <input type="text" id="chat-input" placeholder="Type your message...">
+    <button id="chat-send">Send</button>
+  </div>
+</div>
+
+<!-- Script -->
+<script>
+const isAdmin = window.location.pathname.includes('admin');
+const chatDataKey = 'ironcore_chat_messages';
+
+function getMessages() {
+  return JSON.parse(localStorage.getItem(chatDataKey) || '[]');
+}
+
+function saveMessage(sender, text) {
+  const messages = getMessages();
+  messages.push({ sender, text, time: new Date().toISOString() });
+  localStorage.setItem(chatDataKey, JSON.stringify(messages));
+}
+
+function renderMessages(container) {
+  container.innerHTML = '';
+  const messages = getMessages();
+  messages.forEach(({ sender, text }) => {
+    const div = document.createElement('div');
+    div.className = 'message ' + sender;
+    div.textContent = text;
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage(sender, inputId, container) {
+  const input = document.getElementById(inputId);
+  const text = input.value.trim();
+  if (!text) return;
+  saveMessage(sender, text);
+  input.value = '';
+  renderMessages(container);
+}
+
+function setupChat() {
+  const openBtn = document.getElementById('open-chat-btn');
+  const popup = document.getElementById('chat-popup');
+  const sendBtn = document.getElementById('chat-send');
+  const input = document.getElementById('chat-input');
+  const messagesBox = document.getElementById('chat-messages');
+  const closeBtn = document.getElementById('close-chat-btn');
+
+  // Toggle open/close
+  if (openBtn && popup) {
+    openBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
+      renderMessages(messagesBox);
+    });
+  }
+
+  // Send on click or Enter
+  if (sendBtn && input) {
+    sendBtn.addEventListener('click', () => {
+      sendMessage(isAdmin ? 'admin' : 'guest', 'chat-input', messagesBox);
+    });
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage(isAdmin ? 'admin' : 'guest', 'chat-input', messagesBox);
+      }
+    });
+  }
+
+  // Close button in chat
+  if (closeBtn && popup) {
+    closeBtn.addEventListener('click', () => {
+      popup.style.display = 'none';
+    });
+  }
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (popup && !popup.contains(e.target) && e.target !== openBtn) {
+      popup.style.display = 'none';
+    }
+  });
+
+  renderMessages(messagesBox);
+}
+
+document.addEventListener('DOMContentLoaded', setupChat);
+</script>
+
+</body>
+</html>

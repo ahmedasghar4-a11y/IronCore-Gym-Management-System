@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register - IronCore Gym</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body style="background: url('assets/gym_register_bg.jpg') no-repeat center center fixed; background-size: cover;">
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <img src="assets/ironcore-logo.png" alt="IronCore Gym Logo" class="navbar-logo">
+    <nav class="menu">
+        <a href="index.html">Overview</a>
+        <a href="login.html">Login</a>
+        <a href="membership.html">Membership</a>
+    </nav>
+  </header>
+
+  <!-- Register Section -->
+  <div class="register-overlay">
+    <div class="register-card">
+      <h2>Create Your Account</h2>
+      <form onsubmit="register(); return false;">
+        <input type="text" id="fullName" placeholder="Full Name" required />
+        <input type="number" id="age" placeholder="Age" min="12" required />
+        <select id="gender" required>
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+        <input type="tel" id="phone" placeholder="Phone Number" required />
+        <input type="email" id="registerEmail" placeholder="Email" required />
+        <input type="password" id="registerPassword" placeholder="Password" required />
+        <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+        <input type="text" id="selectedPlan" readonly style="background-color: #eee; color: #000; font-weight: bold; text-align: center; margin-bottom: 1rem;" />
+        <button type="submit">Register</button>
+      </form>
+      <p style="margin-top: 1rem;">Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-column">
+        <h3>About IronCore</h3>
+        <p>IronCore Gym is your second home. With top-tier equipment and expert trainers, we’re here to help you break limits and achieve results.</p>
+      </div>
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+        <a href="index.html">Overview</a><br>
+        <a href="login.html">Login</a><br>
+        <a href="membership.html">Membership</a>
+      </div>
+      <div class="footer-column">
+        <h3>Contact</h3>
+        <p>Email: contact@ironcoregym.com</p>
+        <p>Phone: +1 234 567 8901</p>
+        <p>Location: 123 Flex Ave, Muscle City</p>
+      </div>
+      <div class="footer-column">
+        <h3>Social Links</h3>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-newsletter-box">
+      <h3>Subscribe to Our Newsletter</h3>
+      <p>Get updates on new classes, special offers, and fitness tips.</p>
+      <form class="newsletter-form">
+        <input type="email" placeholder="Enter your email" required>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+
+    <div class="map-container">
+      <iframe src="https://maps.google.com/maps?q=New%20York%20Gym&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <div class="footer-bottom">
+      © 2025 IronCore Gym. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCMAlj_xlSoyIXtsuzNYxOxH1cQ9Fpr97I",
+      authDomain: "ironcoregym-228af.firebaseapp.com",
+      projectId: "ironcoregym-228af",
+      storageBucket: "ironcoregym-228af.appspot.com",
+      messagingSenderId: "1050936195293",
+      appId: "1:1050936195293:web:8bef21a268db39ce7a0334"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const plan = localStorage.getItem("selectedPlan") || "basic";
+    const input = document.getElementById("selectedPlan");
+
+    if (input) {
+      input.value = plan.charAt(0).toUpperCase() + plan.slice(1) + " Plan";
+    }
+  });
+
+
+function register() {
+  const fullName = document.getElementById("fullName").value;
+  const age = document.getElementById("age").value;
+  const gender = document.getElementById("gender").value;
+  const phone = document.getElementById("phone").value;
+  const email = document.getElementById("registerEmail").value;
+  const password = document.getElementById("registerPassword").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
+
+  const planInput = document.getElementById("selectedPlan").value;
+  const plan = planInput.split(" ")[0].toLowerCase(); // Extract from 'Premium Plan' → 'premium'
+
+  if (password !== confirmPassword) {
+    alert("Passwords do not match.");
+    return;
+  }
+
+  firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const uid = userCredential.user.uid;
+      return db.collection("users").doc(uid).set({
+        fullName,
+        age,
+        gender,
+        phone,
+        email,
+        membershipPlan: plan
+      });
+    })
+    .then(() => {
+      alert("Registration successful!");
+      window.location.href = `billing.html?plan=${plan}`;
+    })
+    .catch((error) => {
+      alert("Registration failed: " + error.message);
+    });
+}
+
+  </script>
+</body>
+</html>

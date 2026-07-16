@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Trainer Hours</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .form-container {
+      background-color: #1c1c1c;
+      padding: 30px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #3CB043;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    input {
+      background-color: #f0f0f0;
+      color: #000;
+    }
+
+    button {
+      background-color: #3CB043;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2f9035;
+    }
+
+    .message {
+      text-align: center;
+      color: lightgreen;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Track Trainer Hours</h2>
+    <form id="trackForm">
+      <input type="text" id="trainerName" placeholder="Trainer Name" required />
+      <input type="email" id="trainerEmail" placeholder="Trainer Email" required />
+      <input type="date" id="workDate" required />
+      <input type="number" id="hoursWorked" placeholder="Hours Worked" min="1" required />
+      <button type="submit">Submit Hours</button>
+    </form>
+    <p class="message" id="successMsg">✅ Hours recorded successfully!</p>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCMAlj_xlSoyIXtsuzNYxOxH1cQ9Fpr97I",
+      authDomain: "ironcoregym-228af.firebaseapp.com",
+      projectId: "ironcoregym-228af",
+      storageBucket: "ironcoregym-228af.appspot.com",
+      messagingSenderId: "1050936195293",
+      appId: "1:1050936195293:web:8bef21a268db39ce7a0334"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("trackForm");
+    const successMsg = document.getElementById("successMsg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("trainerName").value.trim();
+      const email = document.getElementById("trainerEmail").value.trim();
+      const date = document.getElementById("workDate").value;
+      const hours = parseFloat(document.getElementById("hoursWorked").value);
+
+      try {
+        await addDoc(collection(db, "trainerHours"), {
+          trainerName: name,
+          trainerEmail: email,
+          date,
+          hours,
+          timestamp: serverTimestamp()
+        });
+
+        successMsg.style.display = "block";
+        form.reset();
+      } catch (error) {
+        console.error("Error saving trainer hours:", error);
+        alert("❌ Could not save. Check console for details.");
+      }
+    });
+  </script>
+
+<!-- Chat Button and Popup -->
+<button id="open-chat-btn" aria-label="Open Chat">💬</button>
+<div id="chat-popup">
+  <div id="chat-popup-header">Chat with Admin</div>
+  <button id="close-chat-btn" aria-label="Close Chat">✖️</button>
+  <div id="chat-messages"></div>
+  <div id="chat-input-wrapper">
+    <input type="text" id="chat-input" placeholder="Type your message...">
+    <button id="chat-send">Send</button>
+  </div>
+</div>
+
+<!-- Script -->
+<script>
+const isAdmin = window.location.pathname.includes('admin');
+const chatDataKey = 'ironcore_chat_messages';
+
+function getMessages() {
+  return JSON.parse(localStorage.getItem(chatDataKey) || '[]');
+}
+
+function saveMessage(sender, text) {
+  const messages = getMessages();
+  messages.push({ sender, text, time: new Date().toISOString() });
+  localStorage.setItem(chatDataKey, JSON.stringify(messages));
+}
+
+function renderMessages(container) {
+  container.innerHTML = '';
+  const messages = getMessages();
+  messages.forEach(({ sender, text }) => {
+    const div = document.createElement('div');
+    div.className = 'message ' + sender;
+    div.textContent = text;
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage(sender, inputId, container) {
+  const input = document.getElementById(inputId);
+  const text = input.value.trim();
+  if (!text) return;
+  saveMessage(sender, text);
+  input.value = '';
+  renderMessages(container);
+}
+
+function setupChat() {
+  const openBtn = document.getElementById('open-chat-btn');
+  const popup = document.getElementById('chat-popup');
+  const sendBtn = document.getElementById('chat-send');
+  const input = document.getElementById('chat-input');
+  const messagesBox = document.getElementById('chat-messages');
+  const closeBtn = document.getElementById('close-chat-btn');
+
+  // Toggle open/close
+  if (openBtn && popup) {
+    openBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
+      renderMessages(messagesBox);
+    });
+  }
+
+  // Send on click or Enter
+  if (sendBtn && input) {
+    sendBtn.addEventListener('click', () => {
+      sendMessage(isAdmin ? 'admin' : 'guest', 'chat-input', messagesBox);
+    });
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage(isAdmin ? 'admin' : 'guest', 'chat-input', messagesBox);
+      }
+    });
+  }
+
+  // Close button in chat
+  if (closeBtn && popup) {
+    closeBtn.addEventListener('click', () => {
+      popup.style.display = 'none';
+    });
+  }
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (popup && !popup.contains(e.target) && e.target !== openBtn) {
+      popup.style.display = 'none';
+    }
+  });
+
+  renderMessages(messagesBox);
+}
+
+document.addEventListener('DOMContentLoaded', setupChat);
+</script>
+
+</body>
+</html>

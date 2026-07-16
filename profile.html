@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Profile - IronCore Gym</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="profile-page">
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <img src="assets/ironcore-logo.png" alt="IronCore Gym Logo" class="navbar-logo">
+    <nav class="menu">
+      <a href="home.html">Home</a>
+      <a href="schedule.html">Classes</a>
+      <a href="trainers.html">Trainrs</a>
+      <a href="my_bookings.html">Bookings</a>
+    </nav>
+  </header>
+
+  <!-- Profile Container -->
+  <main class="profile-container">
+    <div class="profile-card">
+      <div class="profile-header">
+        <i class="fas fa-user-circle profile-icon"></i>
+        <h2 id="displayName">Welcome, User</h2>
+        <p class="membership-plan">Current Plan: <span id="displayPlan">Loading...</span></p>
+      </div>
+
+      <div class="profile-info">
+        <p><strong>Full Name:</strong> <span id="fullNameText">Loading...</span></p>
+        <p><strong>Age:</strong> <span id="ageText">Loading...</span></p>
+        <p><strong>Gender:</strong> <span id="genderText">Loading...</span></p>
+        <p><strong>Phone:</strong> <span id="phoneText">Loading...</span></p>
+      </div>
+
+      <div class="profile-actions">
+        <button class="cta-btn" onclick="showSlideForm()">Edit Profile</button>
+        <button class="cta-btn secondary" onclick="redirectToUpgrade()">Upgrade Plan</button>
+      </div>
+    </div>
+
+    <!-- Slide-up Form Section -->
+    <section id="editFormSlide" class="edit-slide-form">
+      <h3>Edit Your Profile</h3>
+      <form id="profileForm">
+        <input type="text" id="fullName" placeholder="Full Name" required>
+        <input type="number" id="age" placeholder="Age" required>
+        <select id="gender" required>
+          <option value="">Select Gender</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+        <input type="tel" id="phone" placeholder="Phone Number" required>
+
+        <div class="btn-group">
+          <button type="submit" class="cta-btn">Save</button>
+          <button type="button" class="cta-btn cancel" onclick="hideSlideForm()">Cancel</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCMAlj_xlSoyIXtsuzNYxOxH1cQ9Fpr97I",
+      authDomain: "ironcoregym-228af.firebaseapp.com",
+      projectId: "ironcoregym-228af",
+      storageBucket: "ironcoregym-228af.appspot.com",
+      messagingSenderId: "1050936195293",
+      appId: "1:1050936195293:web:8bef21a268db39ce7a0334"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let userDoc;
+    let membershipPlan;
+
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        alert("Not logged in. Redirecting to login.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      userDoc = db.collection("users").doc(user.uid);
+
+      userDoc.get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          membershipPlan = data.membershipPlan;
+          document.getElementById("displayName").textContent = `Welcome, ${data.fullName}`;
+          document.getElementById("displayPlan").textContent = membershipPlan || "-";
+          document.getElementById("fullNameText").textContent = data.fullName;
+          document.getElementById("ageText").textContent = data.age;
+          document.getElementById("genderText").textContent = data.gender;
+          document.getElementById("phoneText").textContent = data.phone;
+
+          document.getElementById("fullName").value = data.fullName;
+          document.getElementById("age").value = data.age;
+          document.getElementById("gender").value = data.gender;
+          document.getElementById("phone").value = data.phone;
+        }
+      });
+    });
+
+    document.getElementById("profileForm").addEventListener("submit", e => {
+      e.preventDefault();
+      userDoc.update({
+        fullName: document.getElementById("fullName").value,
+        age: document.getElementById("age").value,
+        gender: document.getElementById("gender").value,
+        phone: document.getElementById("phone").value
+      }).then(() => {
+        alert("✅ Profile updated successfully!");
+        hideSlideForm();
+        location.reload();
+      }).catch(err => {
+        alert("❌ Update failed: " + err.message);
+      });
+    });
+
+    function showSlideForm() {
+      document.getElementById("editFormSlide").style.display = "block";
+      setTimeout(() => {
+        document.getElementById("editFormSlide").classList.add("active");
+      }, 50);
+    }
+
+    function hideSlideForm() {
+      const form = document.getElementById("editFormSlide");
+      form.classList.remove("active");
+      setTimeout(() => {
+        form.style.display = "none";
+      }, 300);
+    }
+
+    function redirectToUpgrade() {
+      // Always redirect with current plan as query param
+      const plan = (membershipPlan || "basic").toLowerCase();
+      window.location.href = `billing.html?currentPlan=${plan}`;
+    }
+  </script>
+
+<!-- Chat Button and Popup -->
+<button id="open-chat-btn" aria-label="Open Chat">💬</button>
+<div id="chat-popup">
+  <div id="chat-popup-header">Chat with Admin</div>
+  <button id="close-chat-btn" aria-label="Close Chat">✖️</button>
+  <div id="chat-messages"></div>
+  <div id="chat-input-wrapper">
+    <input type="text" id="chat-input" placeholder="Type your message...">
+    <button id="chat-send">Send</button>
+  </div>
+</div>
+
+<!-- Script -->
+<script>
+const isAdmin = window.location.pathname.includes('admin');
+const chatDataKey = 'ironcore_chat_messages';
+
+function getMessages() {
+  return JSON.parse(localStorage.getItem(chatDataKey) || '[]');
+}
+
+function saveMessage(sender, text) {
+  const messages = getMessages();
+  messages.push({ sender, text, time: new Date().toISOString() });
+  localStorage.setItem(chatDataKey, JSON.stringify(messages));
+}
+
+function renderMessages(container) {
+  container.innerHTML = '';
+  const messages = getMessages();
+  messages.forEach(({ sender, text }) => {
+    const div = document.createElement('div');
+    div.className = 'message ' + sender;
+    div.textContent = text;
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage(sender, inputId, container) {
+  const input = document.getElementById(inputId);
+  const text = input.value.trim();
+  if (!text) return;
+  saveMessage(sender, text);
+  input.value = '';
+  renderMessages(container);
+}
+
+function setupChat() {
+  const openBtn = document.getElementById('open-chat-btn');
+  const popup = document.getElementById('chat-popup');
+  const sendBtn = document.getElementById('chat-send');
+  const input = document.getElementById('chat-input');
+  const messagesBox = document.getElementById('chat-messages');
+  const closeBtn = document.getElementById('close-chat-btn');
+
+  // Toggle open/close
+  if (openBtn && popup) {
+    openBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
+      renderMessages(messagesBox);
+    });
+  }
+
+  // Send on click or Enter
+  if (sendBtn && input) {
+    sendBtn.addEventListener('click', () => {
+      sendMessage(isAdmin ? 'admin' : 'guest', 'chat-input', messagesBox);
+    });
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage(isAdmin ? 'admin' : 'guest', 'chat-input', messagesBox);
+      }
+    });
+  }
+
+  // Close button in chat
+  if (closeBtn && popup) {
+    closeBtn.addEventListener('click', () => {
+      popup.style.display = 'none';
+    });
+  }
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (popup && !popup.contains(e.target) && e.target !== openBtn) {
+      popup.style.display = 'none';
+    }
+  });
+
+  renderMessages(messagesBox);
+}
+
+document.addEventListener('DOMContentLoaded', setupChat);
+</script>
+
+</body>
+</html>

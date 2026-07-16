@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Bookings - IronCore Gym</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .navbar {
+      background-color: rgba(20, 20, 20, 0.9);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+    }
+    .navbar-logo {
+      height: 50px;
+    }
+    .menu a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 20px;
+    }
+    h1, h2 {
+      color: #ffffff;
+    }
+    .schedule-section {
+      padding: 40px;
+      text-align: center;
+    }
+    .card-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .feature-card {
+      background-color: #222;
+      border-radius: 10px;
+      padding: 20px;
+      width: 300px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      text-align: left;
+    }
+    .feature-card h3 {
+      margin-top: 0;
+      color: #3CB043;
+    }
+    .feature-card p {
+      margin: 5px 0;
+    }
+    .cancel-btn {
+      margin-top: 10px;
+      background-color: #cc3333;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .cancel-btn:hover {
+      background-color: #aa0000;
+    }
+    .footer {
+      background-color: #000;
+      padding: 30px;
+      color: #bbb;
+      text-align: center;
+    }
+    .footer a {
+      color: #bbb;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <img src="assets/ironcore-logo.png" alt="IronCore Gym Logo" class="navbar-logo">
+    <nav class="menu">
+      <a href="home.html">Home</a>
+      <a href="schedule.html">Classes</a>
+      <a href="trainers.html">Trainrs</a>
+      <a href="my_bookings.html">Bookings</a>
+
+    </nav>
+  </header>
+
+  <main>
+    <!-- Heading -->
+    <div style="margin-top: 100px; text-align: center;">
+      <h1 style="font-size: 2.8rem; font-weight: bold;">Scheduled Sessions</h1>
+    </div>
+
+    <section class="schedule-section">
+      <h2>My Bookings</h2>
+      <div id="booking-cards" class="card-grid"></div>
+      <p id="no-bookings-msg" style="display:none;">You have no bookings yet.</p>
+    </section>
+  </main>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      getDoc,
+      doc,
+      query,
+      where,
+      deleteDoc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import {
+      getAuth,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCMAlj_xlSoyIXtsuzNYxOxH1cQ9Fpr97I",
+      authDomain: "ironcoregym-228af.firebaseapp.com",
+      projectId: "ironcoregym-228af",
+      storageBucket: "ironcoregym-228af.appspot.com",
+      messagingSenderId: "1050936195293",
+      appId: "1:1050936195293:web:8bef21a268db39ce7a0334"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const container = document.getElementById("booking-cards");
+    const noBookingsMsg = document.getElementById("no-bookings-msg");
+
+    async function loadBookings(userEmail) {
+      container.innerHTML = "";
+      noBookingsMsg.style.display = "none";
+
+      const bookingQuery = query(collection(db, "bookings"), where("userEmail", "==", userEmail));
+      const bookingsSnap = await getDocs(bookingQuery);
+
+      let hasVisibleBooking = false;
+
+      for (const bookingDoc of bookingsSnap.docs) {
+        const bookingData = bookingDoc.data();
+        const bookingId = bookingDoc.id;
+        const classId = bookingData.classId;
+
+        const classSnap = await getDoc(doc(db, "trainerAssignments", classId));
+
+        if (!classSnap.exists()) {
+          await deleteDoc(doc(db, "bookings", bookingId)); // clean up orphaned booking
+          continue;
+        }
+
+        const classData = classSnap.data();
+        const className = classData.class || "Unnamed Class";
+        const trainer = classData.trainer || "Unknown Trainer";
+        const date = classData.date || "-";
+        const time = classData.time || "-";
+
+        const timestamp = bookingData.timestamp?.toDate();
+        const formattedDate = timestamp
+          ? timestamp.toLocaleString('en-GB', {
+              day: '2-digit', month: 'short', year: 'numeric',
+              hour: '2-digit', minute: '2-digit'
+            })
+          : "Unknown";
+
+        const card = document.createElement("div");
+        card.className = "feature-card";
+        card.id = `booking-${bookingId}`;
+        card.innerHTML = `
+          <h3>${className}</h3>
+          <p><strong>Trainer:</strong> ${trainer}</p>
+          <p><strong>Date:</strong> ${date}</p>
+          <p><strong>Time:</strong> ${time}</p>
+          <p><strong>Booked On:</strong> ${formattedDate}</p>
+          <button class="cancel-btn" onclick="cancelBooking('${bookingId}')">Cancel Booking</button>
+        `;
+        container.appendChild(card);
+        hasVisibleBooking = true;
+      }
+
+      if (!hasVisibleBooking) {
+        noBookingsMsg.style.display = "block";
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loadBookings(user.email);
+      } else {
+        container.innerHTML = "<p>Please log in to view your bookings.</p>";
+      }
+    });
+
+    window.cancelBooking = async (bookingId) => {
+      if (confirm("Are you sure you want to cancel this booking?")) {
+        try {
+          await deleteDoc(doc(db, "bookings", bookingId));
+          const cardElement = document.getElementById(`booking-${bookingId}`);
+          if (cardElement) cardElement.remove();
+
+          const remaining = container.querySelectorAll(".feature-card").length;
+          if (remaining === 0) {
+            noBookingsMsg.style.display = "block";
+          }
+
+          alert("Booking cancelled.");
+        } catch (error) {
+          console.error("Error cancelling booking:", error);
+          alert("Error cancelling booking. Please try again.");
+        }
+      }
+    };
+  </script>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-column">
+        <h3>About IronCore</h3>
+        <p>
+          IronCore Gym is your second home. With top-tier equipment and expert trainers, we’re here to help you break limits and achieve results.
+        </p>
+      </div>
+
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+    <a href="home.html">Home</a><br>
+    <a href="schedule.html">Classes</a><br>
+    <a href="trainers.html">Trainers</a><br>
+    <a href="my_bookings.html">Bookings</a>
+      </div>
+
+      <div class="footer-column">
+        <h3>Contact</h3>
+        <p>Email: contact@ironcoregym.com</p>
+        <p>Phone: +1 234 567 8901</p>
+        <p>Location: 123 Flex Ave, Muscle City</p>
+      </div>
+
+      <div class="footer-column">
+        <h3>Social Links</h3>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-newsletter-box">
+      <h3>Subscribe to Our Newsletter</h3>
+      <p>Get updates on new classes, special offers, and fitness tips.</p>
+      <form class="newsletter-form">
+        <input type="email" placeholder="Enter your email" required>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+
+    <div class="map-container">
+      <iframe src="https://maps.google.com/maps?q=New%20York%20Gym&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <div class="footer-bottom">
+      © 2025 IronCore Gym. All rights reserved.
+    </div>
+  </footer>
+
+<!-- Chat Button and Popup -->
+<button id="open-chat-btn" aria-label="Open Chat">💬</button>
+<div id="chat-popup">
+  <div id="chat-popup-header">Chat with Admin</div>
+  <button id="close-chat-btn" aria-label="Close Chat">✖️</button>
+  <div id="chat-messages"></div>
+  <div id="chat-input-wrapper">
+    <input type="text" id="chat-input" placeholder="Type your message...">
+    <button id="chat-send">Send</button>
+  </div>
+</div>
+
+<!-- Script -->
+<script>
+const isAdmin = window.location.pathname.includes('admin');
+const chatDataKey = 'ironcore_chat_messages';
+
+function getMessages() {
+  return JSON.parse(localStorage.getItem(chatDataKey) || '[]');
+}
+
+function saveMessage(sender, text) {
+  const messages = getMessages();
+  messages.push({ sender, text, time: new Date().toISOString() });
+  localStorage.setItem(chatDataKey, JSON.stringify(messages));
+}
+
+function renderMessages(container) {
+  container.innerHTML = '';
+  const messages = getMessages();
+  messages.forEach(({ sender, text }) => {
+    const div = document.createElement('div');
+    div.className = 'message ' + sender;
+    div.textContent = text;
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage(sender, inputId, container) {
+  const input = document.getElementById(inputId);
+  const text = input.value.trim();
+  if (!text) return;
+  saveMessage(sender, text);
+  input.value = '';
+  renderMessages(container);
+}
+
+function setupChat() {
+  const openBtn = document.getElementById('open-chat-btn');
+  const popup = document.getElementById('chat-popup');
+  const sendBtn = document.getElementById('chat-send');
+  const input = document.getElementById('chat-input');
+  const messagesBox = document.getElementById('chat-messages');
+  const closeBtn = document.getElementById('close-chat-btn');
+
+  // Toggle open/close
+  if (openBtn && popup) {
+    openBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      popup.style.display = popup.style.display === 'flex' ? 'none' : 'flex';
+      renderMessages(messagesBox);
+    });
+  }
+
+  // Send on click or Enter
+  if (sendBtn && input) {
+    sendBtn.addEventListener('click', () => {
+      sendMessage(isAdmin ? 'admin' : 'guest', 'chat-input', messagesBox);
+    });
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage(isAdmin ? 'admin' : 'guest', 'chat-input', messagesBox);
+      }
+    });
+  }
+
+  // Close button in chat
+  if (closeBtn && popup) {
+    closeBtn.addEventListener('click', () => {
+      popup.style.display = 'none';
+    });
+  }
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (popup && !popup.contains(e.target) && e.target !== openBtn) {
+      popup.style.display = 'none';
+    }
+  });
+
+  renderMessages(messagesBox);
+}
+
+document.addEventListener('DOMContentLoaded', setupChat);
+</script>
+
+</body>
+</html>

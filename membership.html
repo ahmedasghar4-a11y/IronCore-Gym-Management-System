@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Membership - IronCore Gym</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <img src="assets/ironcore-logo.png" alt="IronCore Gym Logo" class="navbar-logo">
+    <nav class="menu">
+      <a href="index.html">Overview</a>
+      <a href="login.html">Login</a>
+      <a href="membership.html">Membership</a>
+    </nav>
+  </header>
+
+  <!-- Membership Cards -->
+  <section class="membership-section">
+    <h2 class="section-heading">Choose Your Membership</h2>
+    <p class="section-subtext">
+      Flexible plans tailored to your lifestyle and fitness goals. Every membership comes with 24/7 gym access, secure locker rooms, and a complimentary fitness assessment.
+    </p>
+
+    <div class="membership-plans">
+      <!-- Basic Plan -->
+      <div class="membership-card">
+        <div class="card-content">
+          <h3>Basic Plan</h3>
+          <p class="price">£19/month</p>
+          <p class="features">
+            Perfect for self-motivated individuals. Gain unlimited access to our gym floor, cardio zone, and weightlifting area — anytime, any day.
+          </p>
+        </div>
+        <button class="join-btn" data-plan="basic">Join Basic</button>
+      </div>
+
+      <!-- Standard Plan -->
+      <div class="membership-card recommended">
+        <div class="badge">Most Popular</div>
+        <div class="card-content">
+          <h3>Standard Plan</h3>
+          <p class="price">£39/month</p>
+          <p class="features">
+            Ideal for those who enjoy group energy. Includes all Basic access, plus unlimited entry to fitness classes, exclusive app tracking, and support.
+          </p>
+        </div>
+        <button class="join-btn" data-plan="standard">Join Standard</button>
+      </div>
+
+      <!-- Premium Plan -->
+      <div class="membership-card premium">
+        <div class="card-content">
+          <h3>Premium Plan</h3>
+          <p class="price">£69/month</p>
+          <p class="features">
+            For serious fitness enthusiasts. Get all Standard benefits, one-on-one sessions with a personal trainer, nutrition advice, and monthly progress reviews.
+          </p>
+        </div>
+        <button class="join-btn" data-plan="premium">Join Premium</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Membership Table -->
+  <section class="membership-section">
+    <h2 class="section-heading">Membership Options</h2>
+    <p class="section-subtext">
+      At IronCore Gym, we offer flexible membership plans designed to suit all fitness levels and goals. Whether you're just starting out, enjoy group workouts, or need personalized coaching — we have a plan for you.
+    </p>
+
+    <div class="membership-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Features</th>
+            <th>Basic (£19/mo)</th>
+            <th>Standard (£39/mo)</th>
+            <th>Premium (£69/mo)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>24/7 Gym Access</td><td>✔</td><td>✔</td><td>✔</td></tr>
+          <tr><td>Cardio & Weight Equipment</td><td>✔</td><td>✔</td><td>✔</td></tr>
+          <tr><td>Group Fitness Classes</td><td>✖</td><td>✔</td><td>✔</td></tr>
+          <tr><td>Fitness App Access</td><td>✖</td><td>✔</td><td>✔</td></tr>
+          <tr><td>Personal Trainer</td><td>✖</td><td>✖</td><td>✔</td></tr>
+          <tr><td>Diet & Nutrition Guidance</td><td>✖</td><td>✖</td><td>✔</td></tr>
+          <tr><td>Monthly Progress Tracking</td><td>✖</td><td>✖</td><td>✔</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+<!-- Modal Popup -->
+<div id="planModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3 id="modalTitle" class="modal-heading"></h3>
+    <div id="modalContent" class="modal-body"></div>
+    <a href="register.html" class="cta-btn" id="proceedBtn">Proceed to Join</a>
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-column">
+        <h3>About IronCore</h3>
+        <p>IronCore Gym is your second home. With top-tier equipment and expert trainers, we’re here to help you break limits and achieve results.</p>
+      </div>
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+        <a href="index.html">Overview</a><br>
+        <a href="login.html">Login</a><br>
+        <a href="membership.html">Membership</a>
+      </div>
+      <div class="footer-column">
+        <h3>Contact</h3>
+        <p>Email: contact@ironcoregym.com</p>
+        <p>Phone: +1 234 567 8901</p>
+        <p>Location: 123 Flex Ave, Muscle City</p>
+      </div>
+      <div class="footer-column">
+        <h3>Social Links</h3>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-newsletter-box">
+      <h3>Subscribe to Our Newsletter</h3>
+      <p>Get updates on new classes, special offers, and fitness tips.</p>
+      <form class="newsletter-form">
+        <input type="email" placeholder="Enter your email" required>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+
+    <div class="map-container">
+      <iframe src="https://maps.google.com/maps?q=New%20York%20Gym&t=&z=13&ie=UTF8&iwloc=&output=embed" frameborder="0" allowfullscreen></iframe>
+    </div>
+
+    <div class="footer-bottom">
+      © 2025 IronCore Gym. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Modal JavaScript -->
+<div id="planModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3 id="modalTitle" class="modal-heading"></h3>
+    <div id="modalContent" class="modal-body"></div>
+    <a href="register.html" class="cta-btn">Proceed to Join</a>
+  </div>
+</div>
+
+<!-- JavaScript for Modal -->
+<script>
+  const modal = document.getElementById("planModal");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalContent = document.getElementById("modalContent");
+  const closeBtn = document.querySelector(".close");
+
+  const planDetails = {
+    basic: `
+      <p><strong>Billing Cycle:</strong> £19/month (billed monthly).</p>
+      <p><strong>Facilities Access:</strong> Full gym access 24/7, including cardio and weights.</p>
+      <p><strong>Joining Fee:</strong> £10 (one-time).</p>
+      <p><strong>Contract:</strong> No commitment. Cancel any time with 7 days’ notice.</p>
+    `,
+    standard: `
+      <p><strong>Billing Cycle:</strong> £39/month.</p>
+      <p><strong>Facilities Access:</strong> Includes all Basic features plus unlimited classes and app tracking.</p>
+      <p><strong>Joining Fee:</strong> £0 (limited offer).</p>
+      <p><strong>Contract:</strong> Month-to-month with flexible cancellation.</p>
+    `,
+    premium: `
+      <p><strong>Billing Cycle:</strong> £69/month or £745/year (save 10%).</p>
+      <p><strong>Facilities Access:</strong> Everything in Standard plus personal trainer, diet plans, and progress tracking.</p>
+      <p><strong>Joining Fee:</strong> Waived.</p>
+      <p><strong>Contract:</strong> 3-month minimum. Annual plan offers added perks.</p>
+    `
+  };
+
+  document.querySelectorAll(".join-btn").forEach(button => {
+    button.addEventListener("click", () => {
+      const plan = button.dataset.plan;
+      modalTitle.textContent = `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`;
+      modalContent.innerHTML = planDetails[plan];
+      localStorage.setItem("selectedPlan", plan); // ✅ stores the selected plan
+      modal.classList.add("active");
+    });
+
+  });
+
+  closeBtn.onclick = () => modal.classList.remove("active");
+  window.onclick = (e) => {
+    if (e.target === modal) modal.classList.remove("active");
+  };
+</script>
+
+
+
+</body>
+</html>
